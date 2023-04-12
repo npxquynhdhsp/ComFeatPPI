@@ -1,4 +1,5 @@
 """
+reproduce: thnhan@hueuni.edu.vn
 # # TÁI LẬP TRÌNH TỪ BÀI BÁO GỐC
 # Sử dụng siêu tham số từ bài báo gốc
 # Sử dụng chương trình trích xuất đặc trưng được cung cấp từ bài báo gốc

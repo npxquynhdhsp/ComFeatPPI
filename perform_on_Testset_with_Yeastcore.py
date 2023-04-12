@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-@author: thnhan
+@author: @thnhan@hueuni.edu.vn
 """
 import os.path
 import pickle

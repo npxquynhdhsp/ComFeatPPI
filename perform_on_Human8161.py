@@ -1,4 +1,5 @@
 """
+@thnhan@hueuni.edu.vn
 Performance on Yeast core datasets:
 1. Using 5-fold cross-validation on "Human8161" datasets.
 2. Params selection

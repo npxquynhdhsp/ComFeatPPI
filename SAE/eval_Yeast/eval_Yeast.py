@@ -62,48 +62,8 @@ def eval_Yeastcore_AC(args):
         rmalldir('./tmp')
         # #####################################################
 
-        # model.fit(tr_X, tr_y,
-        #           epochs=args.epochs,
-        #           batch_size=args.batch,
-        #           verbose=2)
-
         prob_y = model.predict(te_X)
 
-        # # --- Chú ý GIAM PRE
-        # te_y_0 = np.argwhere(te_y == 0).flatten()
-        # # print(te_y_0)
-        # true_n = np.argwhere(prob_y[te_y_0, 1] <= 0.5).flatten()
-        # # print(true_n)
-        # # print(prob_y[te_y_0[true_n]])
-        # prob_y[te_y_0[true_n][:5], 1] += 0.5
-        # prob_y[te_y_0[true_n][:5], 0] -= 0.5
-        # print(prob_y[te_y_0[true_n][:5]])
-        # # ---
-
-        # # --- Chú ý TANG PRE
-        # # print(te_y)
-        # te_y_0 = np.argwhere(te_y == 0).flatten()
-        # # print(te_y_0)
-        # false_p = np.argwhere(prob_y[te_y_0, 1] > 0.5).flatten()
-        # # print(false_p)
-        # # print(prob_y[te_y_0[false_p]])
-        # prob_y[te_y_0[false_p][:8], 1] -= 0.5
-        # prob_y[te_y_0[false_p][:8], 0] += 0.5
-        # print(prob_y[te_y_0[false_p][:10]])
-        # # ---
-
-        # # --- Chú ý GIAM REC/SEN
-        # te_y_1 = np.argwhere(te_y == 1).flatten()
-        # # print(te_y_1)
-        # true_p = np.argwhere(prob_y[te_y_1, 1] > 0.5).flatten()
-        # # print(true_p)
-        # # print(prob_y[te_y_1[true_p]])
-        # prob_y[te_y_1[true_p][:5], 1] -= 0.5
-        # prob_y[te_y_1[true_p][:5], 0] += 0.5
-        #
-        # # ---
-
-        # print(prob_y)
         method_result['fold' + str(ii)] = {"true": te_y[:, 1], "prob": prob_y}
         pickle.dump(method_result, open("SAE_eval_Yeastcore.pkl", "wb"))
 
@@ -165,46 +125,7 @@ def eval_Yeastcore_CT(args):
         rmalldir('./tmp')
         # #####################################################
 
-        # model.fit(tr_X, tr_y,
-        #           epochs=args.epochs,
-        #           batch_size=args.batch,
-        #           verbose=2)
-
         prob_y = model.predict(te_X)
-
-        # # --- Chú ý GIAM PRE
-        # te_y_0 = np.argwhere(te_y == 0).flatten()
-        # # print(te_y_0)
-        # true_n = np.argwhere(prob_y[te_y_0, 1] <= 0.5).flatten()
-        # # print(true_n)
-        # # print(prob_y[te_y_0[true_n]])
-        # prob_y[te_y_0[true_n][:5], 1] += 0.5
-        # prob_y[te_y_0[true_n][:5], 0] -= 0.5
-        # print(prob_y[te_y_0[true_n][:5]])
-        # # ---
-
-        # # --- Chú ý TANG PRE
-        # # print(te_y)
-        # te_y_0 = np.argwhere(te_y == 0).flatten()
-        # # print(te_y_0)
-        # false_p = np.argwhere(prob_y[te_y_0, 1] > 0.5).flatten()
-        # # print(false_p)
-        # # print(prob_y[te_y_0[false_p]])
-        # prob_y[te_y_0[false_p][:8], 1] -= 0.5
-        # prob_y[te_y_0[false_p][:8], 0] += 0.5
-        # print(prob_y[te_y_0[false_p][:10]])
-        # # ---
-
-        # # --- Chú ý GIAM REC/SEN
-        # te_y_1 = np.argwhere(te_y == 1).flatten()
-        # # print(te_y_1)
-        # true_p = np.argwhere(prob_y[te_y_1, 1] > 0.5).flatten()
-        # # print(true_p)
-        # # print(prob_y[te_y_1[true_p]])
-        # prob_y[te_y_1[true_p][:5], 1] -= 0.5
-        # prob_y[te_y_1[true_p][:5], 0] += 0.5
-        #
-        # # ---
 
         # print(prob_y)
         method_result['fold' + str(ii)] = {"true": te_y[:, 1], "prob": prob_y}

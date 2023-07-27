@@ -55,10 +55,4 @@ def parameter_parser():
 
 args = parameter_parser()
 
-# eval_Human_AC(args)
 eval_Human_CT(args)
-# eval_Yeastcore_AC(args)
-# eval_Yeastcore_CT(args)
-#
-# eval_testsets_AC(args)
-# eval_testsets_CT(args)

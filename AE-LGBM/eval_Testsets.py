@@ -1,0 +1,143 @@
+"""
+# # TÁI LẬP TRÌNH TỪ BÀI BÁO GỐC
+# Sử dụng siêu tham số từ bài báo gốc
+# Sử dụng chương trình trích xuất đặc trưng được cung cấp từ bài báo gốc
+"""
+import os
+import pickle
+import time
+
+import numpy as np
+import pandas as pd
+from lightgbm import LGBMClassifier
+from sklearn.model_selection import StratifiedKFold
+from keras import Sequential
+from keras.layers import Dense, Dropout
+from keras import Model
+
+# %%
+
+root_dir = os.getcwd()
+os.chdir(root_dir + '/_original/Yeast')
+print('DIR', os.getcwd())
+
+label = pd.read_csv("label.csv")
+# print(label)
+feat_a = pd.read_csv("total_features_a.csv")
+# print(feat_a)
+feat_b = pd.read_csv("total_features_b.csv")
+# print(feat_b)
+feat_all = pd.concat([feat_a, feat_b], axis=1)
+print(feat_all.shape)
+
+X_no_enc = feat_all.values
+y_no_enc = label.values
+
+
+# %%
+
+
+def AE_net(n_col, k=208):
+    model_AE = Sequential(
+        [
+            Dense(k, activation='sigmoid', input_shape=(n_col,)),
+            Dropout(rate=0.2),
+            Dense(n_col, activation='sigmoid', input_shape=(k,))
+        ]
+    )
+
+    # Constructing Autoencoder
+    model_AE.compile(optimizer='nadam',
+                     loss='mean_squared_error',
+                     metrics="accuracy")
+
+    # model_AE1.summary()
+    enc_net = Model(inputs=model_AE.input,
+                    outputs=model_AE.layers[1].output)
+    # enc_net.summary()
+    return model_AE, enc_net
+
+
+# %%
+
+k = 208
+n_col = feat_a.shape[1]
+model_AE1, enc_a = AE_net(n_col, k)
+
+# Fitting the Autoencoder
+print("\nHuan luyen AE 1...")
+print("feat_a", feat_a.shape)
+history_a = model_AE1.fit(feat_a, feat_a,
+                          epochs=200,
+                          batch_size=50,
+                          validation_split=0.2,
+                          verbose=0)
+
+feat_a_enc = enc_a.predict(feat_a)
+print("feat_a_enc", feat_a_enc.shape)
+
+# %%
+
+print("\nHuan luyen AE 2...")
+print("feat_b", feat_b.shape)
+model_AE2, enc_b = AE_net(n_col, k)
+history_b = model_AE2.fit(feat_b, feat_b,
+                          epochs=200,
+                          batch_size=50,
+                          validation_split=0.2,
+                          verbose=0)
+
+feat_b_enc = enc_b.predict(feat_b)
+print(feat_b_enc.shape)
+
+# %%
+
+gbm = LGBMClassifier(n_estimators=500,  # @200 hoặc 250
+                     num_leaves=80,
+                     learning_rate=0.1,  # @0.1
+                     random_seed=0
+                     )
+
+feat_all_enc = np.concatenate((feat_a_enc, feat_b_enc), axis=1)
+print('\n--- New trainning set', feat_all_enc.shape)
+X_tr = np.copy(feat_all_enc)
+y_tr = np.copy(label).flatten()
+y_tr[y_tr == -1] = 0
+print(y_tr)
+
+gbm.fit(X_tr, y_tr)
+
+
+# %%
+
+def eval_testset(dset_name):
+    os.chdir(root_dir + '/Independent Species/' + dset_name)
+    feat_a = pd.read_csv("total_features_a.csv")
+    feat_a = enc_a.predict(feat_a)
+
+    feat_b = pd.read_csv("total_features_b.csv")
+    feat_b = enc_b.predict(feat_b)
+
+    te_X = np.concatenate((feat_a, feat_b), axis=1)
+    print('\n', dset_name, ', n_samples', len(te_X), end=', ')
+    te_y = [1] * te_X.shape[0]
+
+    prob_y = gbm.predict_proba(te_X)
+
+    pickle.dump(prob_y, open(root_dir + '/Independent Species/__LUU_teston_Yeastcore/' + dset_name + '_pred.pkl',
+                             'wb'))
+    pred_y = gbm.predict(te_X).flatten()
+    # print(pred_y)
+    print(dset_name, "acc {:.4f}".format(sum(pred_y == te_y) / len(te_y)))
+
+
+eval_testset('Celeg')
+eval_testset('Ecoli')
+eval_testset('Hsapi')
+eval_testset('Hpylo')
+eval_testset('Mmusc')
+eval_testset('Dmela')
+
+eval_testset('Wnt')
+eval_testset('CD9')
+eval_testset('Cancer_specific')
